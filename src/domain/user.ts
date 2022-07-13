@@ -5,28 +5,29 @@ export type ConstructUserDTO = {
   password: string;
   profile?: string;
   houses?: string;
+  stocks?: string;
 };
 
 export class User {
-  private _id?: string;
-  private _userName: string;
-  private _email: string;
-  private _password: string;
-  private _profile: string | undefined;
-  private _houses: string | undefined;
+  _id?: string;
+  _userName: string;
+  _email: string;
+  _password: string;
+  _profile?: string;
+  _houses?: string;
+  _stocks?: string;
 
-   constructor(params: ConstructUserDTO) {
+  constructor(params: ConstructUserDTO) {
     this._id = params.id;
     this._userName = params.userName;
     this._email = params.email;
     this._password = params.password;
     this._profile = params.profile;
     this._houses = params.houses;
+    this._stocks = params.stocks;
   }
 
- 
-
-  get id(): string | undefined{
+  get id(): string | undefined {
     return this._id;
   }
   get userName(): string {
@@ -44,6 +45,9 @@ export class User {
 
   get houses(): string | undefined {
     return this._houses;
+  }
+  get stocks(): string | undefined {
+    return this._stocks;
   }
 
   set id(value: string | undefined) {
@@ -64,6 +68,7 @@ export class User {
   set houses(value: string | undefined) {
     this._houses = value;
   }
+  set stocks(value: string | undefined) {
+    this._stocks = value;
+  }
 }
-
-

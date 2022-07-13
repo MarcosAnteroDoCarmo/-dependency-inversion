@@ -15,8 +15,9 @@ id          String    @id         @default(uuid())
 userName    String
 email       String    @unique
 password    String 
-profile     String? 
+profile     String?  
 houses      String? 
+stocks      String?
 
 @@map("users")
 }
