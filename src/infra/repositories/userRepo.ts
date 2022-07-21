@@ -1,87 +1,90 @@
-import { UserService } from "../../application/service/userService";
+import { User as PrismaUser } from "@prisma/client";
 import { IUserRepository } from "../../domain/contracts/contractsUserRepo";
-import { User } from "../../domain/user";
+import { User } from "../../domain/entities/user";
 import { prismaClient } from "../data/mysql/prismaClient";
-
-type PrismaUser = {
-  id?: string;
-  email: string;
-  password: string;
-  userName: string;
-  houses?: string;
-  profile?: string;
-  stocks?: string;
-};
-
-export type ManyUsers = {
-  id: string;
-  userName: string;
-  email: string;
-  password: string;
-  profile: string | null;
-  houses: string | null;
-  stocks: string | null;
-}[];
 
 export class UserRepo implements IUserRepository {
   constructor() {}
 
   async createUser(params: User) {
-    const user = (await prismaClient.user.create({
+    if (params.profileId == undefined) {
+      params.profileId = "null";
+    }
+
+    const user = await prismaClient.user.create({
       data: {
         email: params.email,
         password: params.password,
         userName: params.userName,
-        houses: params.houses,
-        profile: params.profile,
-        stocks: params.stocks,
+        profileId: params.profileId,
+        houses: params.houseIds
+          ? { connect: params.houseIds.map((houseId) => ({ id: houseId })) }
+          : undefined,
+        stocks: params.stockIds
+          ? { connect: params.stockIds.map((stockId) => ({ id: stockId })) }
+          : undefined,
       },
-    })) as PrismaUser;
+    });
 
     return this.prismaUserToUser(user);
   }
 
   async findOneUser(email: string) {
-    const user = (await prismaClient.user.findUnique({
+    const user = await prismaClient.user.findUnique({
       where: { email },
-    })) as PrismaUser | null;
+    });
 
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      console.log("User not found");
+
+      return user;
+    }
 
     return this.prismaUserToUser(user);
   }
 
   async findManyUser(userName: string) {
-    const user = await prismaClient.user.findMany({
+    const users = await prismaClient.user.findMany({
       where: { userName },
       select: {
         id: true,
         email: true,
         userName: true,
         password: true,
+        profileId: true,
         profile: true,
         houses: true,
         stocks: true,
       },
     });
 
-    if (!user) throw new Error("User not found");
+    if (!users) throw new Error("User not found");
 
-    return user;
+    return users.map(this.prismaUserToUser);
   }
 
   async listUser() {
-    const users = await prismaClient.user.findMany();
-
+    const users = await prismaClient.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        userName: true,
+        password: true,
+        profileId: true,
+        profile: true,
+        houses: true,
+        stocks: true,
+      },
+    });
     if (!users) throw new Error("User not found");
 
-    return users;
+    return users.map(this.prismaUserToUser);
   }
 
   async deleteUser(email: string) {
-    const user = (await prismaClient.user.delete({
+    const user = await prismaClient.user.delete({
       where: { email },
-    })) as PrismaUser | null;
+    });
 
     if (!user) throw new Error("User not found");
 
@@ -89,17 +92,14 @@ export class UserRepo implements IUserRepository {
   }
 
   async updateUser(params: User) {
-    const user = (await prismaClient.user.update({
+    const user = await prismaClient.user.update({
       where: { email: params.email },
       data: {
         email: params.email,
         password: params.password,
         userName: params.userName,
-        houses: params.houses,
-        profile: params.profile,
-        stocks: params.stocks,
       },
-    })) as PrismaUser | null;
+    });
 
     if (!user) throw new Error("User not found");
 
@@ -107,71 +107,21 @@ export class UserRepo implements IUserRepository {
   }
 
   prismaUserToUser(params: PrismaUser): User {
+    if (params.profileId == null) {
+      return new User({
+        id: params.id,
+        userName: params.userName,
+        email: params.email,
+        password: params.password,
+      });
+    }
+
     return new User({
       id: params.id,
       userName: params.userName,
       email: params.email,
       password: params.password,
-      profile: params.profile,
-      houses: params.houses,
-      stocks: params.stocks,
+      profileId: params.profileId,
     });
   }
 }
-
-// const repository = new UserRepo();
-
-// const createUser = async (params: User) => {
-//   const user = await repository.createUser(params);
-
-//   console.log(user);
-// };
-
-// const findUser = async (email:string) => {
-//   const user = await repository.findOneUser(email);
-
-//   console.log(user);
-// };
-
-// const many = async (userName:string) => {
-//   const users = await repository.findManyUser(userName);
-
-//   console.log(users);
-// };
-
-// const list = async () => {
-
-//  const user = await repository.listUser()
-
-//  console.log(user)
-// }
-
-// const delet = async (email:string) => {
-//   const user = await repository.deleteUser(email);
-
-//   console.log(user);
-// };
-
-// const update = async (params: User) => {
-//   const v = await repository.updateUser(params);
-
-//   console.log(v);
-// };
-
-// // const user = new User({
-// //   email: "marcos20",
-// //   password: "marcos7755",
-// //   userName: "marcos3",
-// //   houses: "marcos5555",
-// //   profile: "marcos0000",
-// //   stocks: "marcos9889",
-// // });
-
-// // console.log(user);
-
-// // createUser(user);
-// // findUser("marcos20");
-// // many("marcos3");
-// // list();
-// // delet("marcos20");
-// // update(user);

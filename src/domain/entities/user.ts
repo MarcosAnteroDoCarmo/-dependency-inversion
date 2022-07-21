@@ -3,28 +3,31 @@ export type ConstructUserDTO = {
   userName: string;
   email: string;
   password: string;
+  profileId?: string;
   profile?: string;
-  houses?: string;
-  stocks?: string;
+  houseIds?: string[];
+  stockIds?: string[];
 };
 
 export class User {
-  _id?: string;
-  _userName: string;
-  _email: string;
-  _password: string;
-  _profile?: string;
-  _houses?: string;
-  _stocks?: string;
+  private _id?: string;
+  private _userName: string;
+  private _email: string;
+  private _password: string;
+  private _profileId?: string;
+  private _profile?: string;
+  private _houseIds?: string[];
+  private _stockIds?: string[];
 
   constructor(params: ConstructUserDTO) {
     this._id = params.id;
     this._userName = params.userName;
     this._email = params.email;
     this._password = params.password;
+    this._profileId = params.profileId;
     this._profile = params.profile;
-    this._houses = params.houses;
-    this._stocks = params.stocks;
+    this._houseIds = params.houseIds;
+    this._stockIds = params.stockIds;
   }
 
   get id(): string | undefined {
@@ -39,15 +42,18 @@ export class User {
   get password(): string {
     return this._password;
   }
+  get profileId(): string | undefined {
+    return this._profileId;
+  }
   get profile(): string | undefined {
     return this._profile;
   }
 
-  get houses(): string | undefined {
-    return this._houses;
+  get houseIds(): string[] | undefined {
+    return this._houseIds;
   }
-  get stocks(): string | undefined {
-    return this._stocks;
+  get stockIds(): string[] | undefined {
+    return this._stockIds;
   }
 
   set id(value: string | undefined) {
@@ -62,13 +68,16 @@ export class User {
   set password(value: string) {
     this._password = value;
   }
+  set profileId(value: string | undefined) {
+    this._profileId = value;
+  }
   set profile(value: string | undefined) {
     this._profile = value;
   }
-  set houses(value: string | undefined) {
-    this._houses = value;
+  set houseIds(value: string[] | undefined) {
+    this._houseIds = value;
   }
-  set stocks(value: string | undefined) {
-    this._stocks = value;
+  set stockIds(value: string[] | undefined) {
+    this._stockIds = value;
   }
 }

@@ -1,10 +1,10 @@
-import { Stocks } from "../stocks";
+import { Stocks } from "../entities/stocks";
 
 export interface IStocksRepository {
   createStocks: (params: Stocks) => Promise<Stocks>;
-  deleteStocks: (params: Stocks) => Promise<Stocks>;
-  findOneStocks: (id: Stocks) => Promise<Stocks>;
-  findManyStocks: (params: Stocks) => Promise<Stocks>;
-  listStocks: (params: Stocks) => Promise<Stocks>;
+  deleteStocks: (id: string) => Promise<Stocks>;
+  findOneStocks: (id: string) => Promise<Stocks | null>;
+  findManyStocks: (valuation: number) => Promise<Stocks[]>;
+  listStocks: (params: Stocks) => Promise<Stocks[]>;
   updateStocks: (params: Stocks) => Promise<Stocks>;
 }
