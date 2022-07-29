@@ -12,7 +12,6 @@ model User {
   userName  String
   email     String   @unique
   password  String
-  profileId String?
   profile   Profile?
   houses    House[]
   stocks    Stocks[]
@@ -24,7 +23,7 @@ model Profile {
   id        String   @id @default(uuid())
   userName  String   @unique
   createdAt DateTime
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @unique
 
   @@map("profile")

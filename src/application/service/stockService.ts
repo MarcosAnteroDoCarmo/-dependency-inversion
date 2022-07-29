@@ -1,49 +1,43 @@
+import { IStocksRepository } from "../../domain/contracts/contractsStocksRepo";
 import { ConstructStockDTO, Stocks } from "../../domain/entities/stocks";
-import { StocksRepo } from "../../infra/repositories/stocksRepo";
 
-Stocks;
-
-export class StocksService {
-  private repository: StocksRepo;
-
-  constructor() {
-    this.repository = new StocksRepo();
-  }
+export class StockService {
+  constructor(private stockRepository: IStocksRepository) {}
 
   createStocks(params: ConstructStockDTO): Promise<Stocks> {
     const { id, company, valuation, userIds: userId } = params;
 
     const stocks = new Stocks({ id, company, valuation, userIds: userId });
 
-    return this.repository.createStocks(stocks);
+    return this.stockRepository.createStocks(stocks);
   }
 
   findOneStocks(id: string) {
-    const stocks = this.repository.findOneStocks(id);
+    const stocks = this.stockRepository.findOneStocks(id);
 
     return stocks;
   }
 
   findManyStocks(valuation: number) {
-    const stocks = this.repository.findManyStocks(valuation);
+    const stocks = this.stockRepository.findManyStocks(valuation);
 
     return stocks;
   }
 
   listStocks() {
-    const stocks = this.repository.listStocks();
+    const stocks = this.stockRepository.listStocks();
 
     return stocks;
   }
 
   deleteStocks(id: string) {
-    const stocks = this.repository.deleteStocks(id);
+    const stocks = this.stockRepository.deleteStocks(id);
 
     return stocks;
   }
 
   updateStocks(params: Stocks) {
-    const stocks = this.repository.updateStocks(params);
+    const stocks = this.stockRepository.updateStocks(params);
 
     return stocks;
   }

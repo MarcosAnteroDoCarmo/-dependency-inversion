@@ -1,9 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { userRouter } from "./application/controllers/userController";
-import { profileRouter } from "./application/controllers/profileController";
-import { houseRouter } from "./application/controllers/houseController";
-import { stocksRouter } from "./application/controllers/stocksController";
+import { userRouter } from "./infra/router/userRouter";
+import { profileRouter } from "./infra/router/profileRouter";
+import { houseRouter } from "./infra/router/houseRouter";
+import { stocksRouter } from "./infra/router/stockRouter";
+
 
 const app = express();
 

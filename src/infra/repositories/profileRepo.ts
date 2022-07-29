@@ -13,8 +13,11 @@ export class ProfileRepo implements IProfileRepository {
         userName: params.userName,
         createdAt: params.createdAt,
         userId: params.userId,
-      },
+      },include: {User: true}
     });
+
+    console.log("repo..............................................");
+    console.log(profile);
 
     return this.prismaProfileToProfile(profile);
   }
@@ -91,11 +94,12 @@ export class ProfileRepo implements IProfileRepository {
     return this.prismaProfileToProfile(profile);
   }
 
-  prismaProfileToProfile(params: PrismaProfile): Profile {
+  prismaProfileToProfile(params: any): Profile {
     return new Profile({
       id: params.id,
       userName: params.userName,
-      userId: params.userId,
+      userId: params.userId
+      
     });
   }
 }

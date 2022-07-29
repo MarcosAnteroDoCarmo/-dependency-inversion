@@ -1,48 +1,43 @@
-
+import { IProfileRepository } from "../../domain/contracts/contractsProfileRepo";
 import { ConstructProfileDTO, Profile } from "../../domain/entities/profile";
-import { ProfileRepo } from "../../infra/repositories/profileRepo";
 
 export class ProfileService {
-  private repository: ProfileRepo;
-
-  constructor() {
-    this.repository = new ProfileRepo();
-  }
+  constructor(private profileRepository: IProfileRepository) {}
 
   createProfile(params: ConstructProfileDTO): Promise<Profile> {
     const { id, userName, userId } = params;
 
     const profile = new Profile({ id, userName, userId });
 
-    return this.repository.createProfile(profile);
+    return this.profileRepository.createProfile(profile);
   }
 
   findOneProfile(userName: string) {
-    const profile = this.repository.findOneProfile(userName);
+    const profile = this.profileRepository.findOneProfile(userName);
 
     return profile;
   }
 
   findManyProfile(userName: string) {
-    const profile = this.repository.findManyProfile(userName);
+    const profile = this.profileRepository.findManyProfile(userName);
 
     return profile;
   }
 
   listProfile() {
-    const profile = this.repository.listProfile();
+    const profile = this.profileRepository.listProfile();
 
     return profile;
   }
 
   deleteProfile(userName: string) {
-    const profile = this.repository.deleteProfile(userName);
+    const profile = this.profileRepository.deleteProfile(userName);
 
     return profile;
   }
 
   updateProfile(params: Profile) {
-    const profile = this.repository.updateProfile(params);
+    const profile = this.profileRepository.updateProfile(params);
 
     return profile;
   }

@@ -5,6 +5,6 @@ export interface IStocksRepository {
   deleteStocks: (id: string) => Promise<Stocks>;
   findOneStocks: (id: string) => Promise<Stocks | null>;
   findManyStocks: (valuation: number) => Promise<Stocks[]>;
-  listStocks: (params: Stocks) => Promise<Stocks[]>;
+  listStocks: () => Promise<Stocks[]>;
   updateStocks: (params: Stocks) => Promise<Stocks>;
 }

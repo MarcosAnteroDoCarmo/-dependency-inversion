@@ -1,102 +1,103 @@
-import express from "express";
+import { Request, Response } from "express";
 import { ProfileService } from "../service/profileService";
 
-export const profileRouter = express.Router();
+export class ProfileController {
+  constructor(private profileService: ProfileService) {}
 
-const profileService = new ProfileService();
+  async create(req: Request, res: Response) {
+    try {
+      const { id, userName, createdAt, userId } = req.body;
 
-profileRouter.post("/profiles", async (req, res) => {
-  try {
-    const { id, userName, createdAt, userId } = req.body;
+      if (!userName) throw new Error(" a profileName is needed");
 
-    if (!userName) throw new Error(" a profileName is needed");
+      console.log(req.body);
 
-    console.log(req.body);
+      if (await this.profileService.findOneProfile(userName))
+        throw new Error("This profile already exists");
 
-    if (await profileService.findOneProfile(userName))
-      throw new Error("This profile already exists");
+      const profile = await this.profileService.createProfile(req.body);
 
-    const profile = await profileService.createProfile(req.body);
+      console.log(profile);
 
-    console.log(profile);
+      return res.send({ profile, message: "New profile created" });
+    } catch (err: unknown) {
+      if (err instanceof Error) return res.status(400).send(err.message);
 
-    return res.send({ profile, message: "New profile created" });
-  } catch (err: unknown) {
-    if (err instanceof Error) return res.status(400).send(err.message);
+      console.log(err);
 
-    console.log(err);
-
-    return res.status(500).send("Server Error");
+      return res.status(500).send("Server Error");
+    }
   }
-});
 
-profileRouter.get("/profiles", async (req, res) => {
-  try {
-    const profiles = await profileService.listProfile();
+  async list(req: Request, res: Response) {
+    try {
+      const profiles = await this.profileService.listProfile();
 
-    return res.send({ profiles });
-  } catch {
-    return res.status(400).send({ message: "Error reading profile" });
+      return res.send({ profiles });
+    } catch {
+      return res.status(400).send({ message: "Error reading profile" });
+    }
   }
-});
 
-profileRouter.get("/profiles/:email", async (req, res) => {
-  try {
-    const { email } = req.params;
+  async findOne(req: Request, res: Response) {
+    try {
+      const { userName } = req.params;
 
-    const profiles = await profileService.findOneProfile(email);
+      const profiles = await this.profileService.findOneProfile(userName);
 
-    return res.send({ profiles });
-  } catch {
-    return res.status(400).send({ message: "Error reading profile" });
+      return res.send({ profiles });
+    } catch {
+      return res.status(400).send({ message: "Error reading profile" });
+    }
   }
-});
 
-profileRouter.get("/manyprofiles/:profileName", async (req, res) => {
-  try {
-    const { profileName } = req.params;
+  async findMany(req: Request, res: Response) {
+    try {
+      const { userName } = req.params;
 
-    const profiles = await profileService.findManyProfile(profileName);
+      const profiles = await this.profileService.findManyProfile(userName);
 
-    return res.send({ profiles });
-  } catch {
-    return res.status(400).send({ message: "Error reading profile" });
+      return res.send({ profiles });
+    } catch {
+      return res.status(400).send({ message: "Error reading profile" });
+    }
   }
-});
 
-profileRouter.delete("/profiles/:email", async (req, res) => {
-  try {
-    const { email } = req.params;
+  async deleteOne(req: Request, res: Response) {
+    try {
+      const { userName } = req.params;
 
-    if (!email) throw new Error("I need email for this!");
+      if (!userName) throw new Error("I need userName for this!");
 
-    if (!(await profileService.findOneProfile(email)))
-      throw new Error("This email does not exist");
+      if (!(await this.profileService.findOneProfile(userName)))
+        throw new Error("This userName does not exist");
 
-    await profileService.deleteProfile(email);
+      await this.profileService.deleteProfile(userName);
 
-    return res.send({ message: "profile deleted" });
-  } catch (err: unknown) {
-    if (err instanceof Error) return res.status(400).send(err.message);
-    return res.status(500).send("Server Error");
+      return res.send({ message: "profile deleted" });
+    } catch (err: unknown) {
+      if (err instanceof Error) return res.status(400).send(err.message);
+      return res.status(500).send("Server Error");
+    }
   }
-});
 
-profileRouter.put("/profiles/:userName", async (req, res) => {
-  try {
-    const { userName } = req.params;
-    const data = req.body;
+  async update(req: Request, res: Response) {
+    try {
+      const { userName } = req.params;
+      const data = req.body;
 
-    if (!(await profileService.findOneProfile(userName)))
-      throw new Error("This email does not exist");
+      if (!(await this.profileService.findOneProfile(userName)))
+        throw new Error("This userName does not exist");
 
-    if (userName !== data.userName) throw new Error("Unable to change userName");
+      if (userName !== data.userName)
+        throw new Error("Unable to change userName");
 
-    const profile = await profileService.updateProfile(data);
+      const profile = await this.profileService.updateProfile(data);
 
-    return res.send({ userName, profile });
-  } catch (err: unknown) {
-    if (err instanceof Error) return res.status(400).send(err.message);
-    return res.status(500).send("Error updating profile");
+      return res.send({ userName, profile });
+    } catch (err: unknown) {
+      if (err instanceof Error) return res.status(400).send(err.message);
+      return res.status(500).send("Error updating profile");
+    }
   }
-});
+}

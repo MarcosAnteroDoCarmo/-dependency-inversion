@@ -4,7 +4,7 @@ import { Stocks } from "../../domain/entities/stocks";
 
 import { prismaClient } from "../data/mysql/prismaClient";
 
-export class StocksRepo implements IStocksRepository {
+export class StockRepo implements IStocksRepository {
   constructor() {}
 
   async createStocks(params: Stocks) {
@@ -15,8 +15,8 @@ export class StocksRepo implements IStocksRepository {
         valuation: params.valuation,
         user: params.userId
           ? { connect: params.userId.map((userId) => ({ id: userId })) }
-          : undefined,
-      },
+          : undefined
+      }, 
     });
 
     return this.prismaStocksToStocks(stocks);

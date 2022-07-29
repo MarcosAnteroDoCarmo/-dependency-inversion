@@ -1,5 +1,4 @@
-
-import { Profile } from "../profile";
+import { Profile } from "../entities/profile";
 
 export interface IProfileRepository {
   createProfile: (params: Profile) => Promise<Profile>;

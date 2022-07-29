@@ -1,4 +1,4 @@
-import { House } from "../house";
+import { House } from "../entities/house";
 
 export interface IHouseRepository {
   createHouse: (params: House) => Promise<House>;

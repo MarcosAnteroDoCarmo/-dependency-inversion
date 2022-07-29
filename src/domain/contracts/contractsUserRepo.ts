@@ -6,6 +6,8 @@ export interface IUserRepository {
   updateUser: (params: User) => Promise<User>;
   findOneUser: (email: string) => Promise<User|null>;
   findManyUser: (userName: string) => Promise<User[]>;
-  listUser: () => Promise<User[]>;
+  listUser: (options?: {
+    include: { houses: boolean; profile: boolean; stocks: boolean };
+  }) => Promise<User[]>;
 }
 

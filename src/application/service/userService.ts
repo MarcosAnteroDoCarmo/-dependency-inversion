@@ -1,12 +1,8 @@
+import { IUserRepository } from "../../domain/contracts/contractsUserRepo";
 import { ConstructUserDTO, User } from "../../domain/entities/user";
-import { UserRepo } from "../../infra/repositories/userRepo";
 
 export class UserService {
-  private repository: UserRepo;
-
-  constructor() {
-    this.repository = new UserRepo();
-  }
+  constructor(private userRepository: IUserRepository) {}
 
   createUser(params: ConstructUserDTO): Promise<User> {
     const {
@@ -14,7 +10,6 @@ export class UserService {
       userName,
       email,
       password,
-      profile,
       profileId,
       houseIds,
       stockIds,
@@ -26,41 +21,46 @@ export class UserService {
       email,
       password,
       profileId,
-      profile,
       houseIds,
       stockIds,
     });
 
-    return this.repository.createUser(user);
+    console.log("service..............................................")
+    console.log(user)
+
+    return this.userRepository.createUser(user);
   }
 
   findOneUser(email: string) {
-    const user = this.repository.findOneUser(email);
+    const user = this.userRepository.findOneUser(email);
 
     return user;
   }
 
   findManyUser(userName: string) {
-    const user = this.repository.findManyUser(userName);
+    const user = this.userRepository.findManyUser(userName);
 
     return user;
   }
 
-  listUser() {
-    const user = this.repository.listUser();
+  listUser(options?: {
+    include: { houses: boolean; profile: boolean; stocks: boolean };
+  }) {
+    const user = this.userRepository.listUser(options);
 
     return user;
   }
 
   deleteUser(email: string) {
-    const user = this.repository.deleteUser(email);
+    const user = this.userRepository.deleteUser(email);
 
     return user;
   }
 
   updateUser(params: User) {
-    const user = this.repository.updateUser(params);
+    const user = this.userRepository.updateUser(params);
 
     return user;
   }
 }
+

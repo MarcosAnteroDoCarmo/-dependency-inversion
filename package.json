@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node dist/index.js",
-    "buid": "yarn tsc --build",
+    "build": "yarn tsc --build",
     "dev": "ts-node src/index.ts",
     "setup": "yarn add @types/node typescript && yarn add ts-node -D && yarn tsc --init"
   },
@@ -21,6 +21,6 @@
   },
   "devDependencies": {
     "prisma": "^4.0.0",
-    "ts-node": "^10.8.2"
+    "ts-node": "^10.9.1"
   }
 }
