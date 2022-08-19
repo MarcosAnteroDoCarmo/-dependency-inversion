@@ -3,6 +3,8 @@ export type ConstructUserDTO = {
   userName: string;
   email: string;
   password: string;
+  money: number;
+  createdAt: Date;
   profileId?: string;
   houseIds?: string[];
   stockIds?: string[];
@@ -13,6 +15,8 @@ export class User {
   private _userName: string;
   private _email: string;
   private _password: string;
+  private _money?: number;
+  private _createdAt: Date;
   private _profileId?: string;
   private _houseIds?: string[];
   private _stockIds?: string[];
@@ -22,6 +26,8 @@ export class User {
     this._userName = params.userName;
     this._email = params.email;
     this._password = params.password;
+    this._money = params.money;
+    this._createdAt = params.createdAt || new Date();
     this._profileId = params.profileId;
     this._houseIds = params.houseIds;
     this._stockIds = params.stockIds;
@@ -38,6 +44,12 @@ export class User {
   }
   get password(): string {
     return this._password;
+  }
+  get money(): number | undefined {
+    return this._money;
+  }
+  get createdAt(): Date {
+    return this._createdAt;
   }
   get profileId(): string | undefined {
     return this._profileId;
@@ -61,6 +73,12 @@ export class User {
   }
   set password(value: string) {
     this._password = value;
+  }
+  set money(value: number | undefined) {
+    this._money = value;
+  }
+  set createdAt(value: Date) {
+    this._createdAt = value;
   }
   set profileId(value: string | undefined) {
     this._profileId = value;

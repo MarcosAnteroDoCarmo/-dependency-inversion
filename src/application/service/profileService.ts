@@ -5,9 +5,9 @@ export class ProfileService {
   constructor(private profileRepository: IProfileRepository) {}
 
   createProfile(params: ConstructProfileDTO): Promise<Profile> {
-    const { id, userName, userId } = params;
+    const { id, userName,createdAt, userId } = params;
 
-    const profile = new Profile({ id, userName, userId });
+    const profile = new Profile({ id, userName, createdAt, userId });
 
     return this.profileRepository.createProfile(profile);
   }

@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "yarn tsc --build",
-    "dev": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
     "setup": "yarn add @types/node typescript && yarn add ts-node -D && yarn tsc --init"
   },
   "dependencies": {

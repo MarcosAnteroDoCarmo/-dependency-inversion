@@ -6,7 +6,7 @@ export class ProfileController {
 
   async create(req: Request, res: Response) {
     try {
-      const { id, userName, createdAt, userId } = req.body;
+      const { userName } = req.body;
 
       if (!userName) throw new Error(" a profileName is needed");
 

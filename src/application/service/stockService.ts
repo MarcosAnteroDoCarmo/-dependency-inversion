@@ -1,25 +1,29 @@
-import { IStocksRepository } from "../../domain/contracts/contractsStocksRepo";
+import {
+  FindManyStocks,
+  FindOneStock,
+  IStocksRepository,
+} from "../../domain/contracts/contractsStocksRepo";
 import { ConstructStockDTO, Stocks } from "../../domain/entities/stocks";
 
 export class StockService {
   constructor(private stockRepository: IStocksRepository) {}
 
   createStocks(params: ConstructStockDTO): Promise<Stocks> {
-    const { id, company, valuation, userIds: userId } = params;
+    const { id, company, valuation, createdAt, userIds } = params;
 
-    const stocks = new Stocks({ id, company, valuation, userIds: userId });
+    const stocks = new Stocks({ id, company, valuation, createdAt, userIds });
 
     return this.stockRepository.createStocks(stocks);
   }
 
-  findOneStocks(id: string) {
-    const stocks = this.stockRepository.findOneStocks(id);
+  findOneStock(params: FindOneStock) {
+    const stocks = this.stockRepository.findOneStock(params);
 
     return stocks;
   }
 
-  findManyStocks(valuation: number) {
-    const stocks = this.stockRepository.findManyStocks(valuation);
+  findManyStocks(params: FindManyStocks) {
+    const stocks = this.stockRepository.findManyStocks(params);
 
     return stocks;
   }

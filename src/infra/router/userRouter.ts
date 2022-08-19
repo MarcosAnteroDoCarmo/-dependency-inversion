@@ -11,10 +11,7 @@ userRouter.get("/users", userController.list.bind(userController));
 
 userRouter.get("/users/:email", userController.findOne.bind(userController));
 
-userRouter.get(
-  "/manyusers/:userName",
-  userController.findMany.bind(userController)
-);
+userRouter.get("/manyusers", userController.findMany.bind(userController));
 
 userRouter.delete(
   "/users/:email",

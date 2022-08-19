@@ -1,5 +1,9 @@
 import { Stocks as PrismaStocks } from "@prisma/client";
-import { IStocksRepository } from "../../domain/contracts/contractsStocksRepo";
+import {
+  FindManyStocks,
+  FindOneStock,
+  IStocksRepository,
+} from "../../domain/contracts/contractsStocksRepo";
 import { Stocks } from "../../domain/entities/stocks";
 
 import { prismaClient } from "../data/mysql/prismaClient";
@@ -13,33 +17,37 @@ export class StockRepo implements IStocksRepository {
         id: params.id,
         company: params.company ?? null,
         valuation: params.valuation,
-        user: params.userId
-          ? { connect: params.userId.map((userId) => ({ id: userId })) }
-          : undefined
-      }, 
+        createdAt: params.createdAt,
+        user: params._userIds
+          ? { connect: params._userIds.map((userId) => ({ id: userId })) }
+          : undefined,
+      },
     });
 
     return this.prismaStocksToStocks(stocks);
   }
 
-  async findOneStocks(id: string) {
+  async findOneStock(params: FindOneStock) {
+    const { id, company } = params;
+
     const stocks = await prismaClient.stocks.findUnique({
-      where: { id },
+      where: { id, company },
       include: { user: true },
     });
 
     if (!stocks) {
-      console.log("Stocks not found");
-
-      return stocks;
+      throw new Error("Stocks not found");
     }
 
     return this.prismaStocksToStocks(stocks);
   }
 
-  async findManyStocks(valuation: number) {
+  async findManyStocks(params: FindManyStocks) {
     const stocks = await prismaClient.stocks.findMany({
-      where: { valuation },
+      where: {
+        id: { in: params.ids },
+        user: { some: { id: params.userIds } },
+      },
     });
 
     if (!stocks) throw new Error("Stocks not found");
@@ -48,14 +56,7 @@ export class StockRepo implements IStocksRepository {
   }
 
   async listStocks() {
-    const stocks = await prismaClient.stocks.findMany({
-      select: {
-        id: true,
-        company: true,
-        valuation: true,
-        user: true,
-      },
-    });
+    const stocks = await prismaClient.stocks.findMany({});
     if (!stocks) throw new Error("Stocks not found");
 
     return stocks.map(this.prismaStocksToStocks);
@@ -89,12 +90,13 @@ export class StockRepo implements IStocksRepository {
     return this.prismaStocksToStocks(stocks);
   }
 
-  prismaStocksToStocks(params: PrismaStocks & { userId?: string[] }): Stocks {
+  prismaStocksToStocks(params: PrismaStocks & { userIds?: string[] }): Stocks {
     return new Stocks({
       id: params.id,
       company: params.company,
       valuation: params.valuation,
-      userIds: params.userId,
+      createdAt: params.createdAt,
+      userIds: params.userIds,
     });
   }
 }

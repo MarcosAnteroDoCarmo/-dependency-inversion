@@ -1,5 +1,9 @@
 import { House as PrismaHouse } from "@prisma/client";
-import { IHouseRepository } from "../../domain/contracts/contractsHouseRepo";
+import {
+  FindManyHouse,
+  FindOneHouse,
+  IHouseRepository,
+} from "../../domain/contracts/contractsHouseRepo";
 import { House } from "../../domain/entities/house";
 import { prismaClient } from "../data/mysql/prismaClient";
 
@@ -11,6 +15,7 @@ export class HouseRepo implements IHouseRepository {
       data: {
         id: params.id,
         address: params.address,
+        createdAt: params.createdAt,
         valuation: params.valuation,
         userId: params.userId,
       },
@@ -19,9 +24,12 @@ export class HouseRepo implements IHouseRepository {
     return this.prismaHouseToHouse(house);
   }
 
-  async findOneHouse(address: string) {
+  async findOneHouse(params: FindOneHouse) {
+    const { id, address } = params;
+
     const house = await prismaClient.house.findUnique({
-      where: { address },
+      where: { id, address },
+      include: { user: params.options?.include.user || false },
     });
 
     if (!house) {
@@ -33,16 +41,9 @@ export class HouseRepo implements IHouseRepository {
     return this.prismaHouseToHouse(house);
   }
 
-  async findManyHouse(valuation: number) {
+  async findManyHouse(params: FindManyHouse) {
     const houses = await prismaClient.house.findMany({
-      where: { valuation },
-      select: {
-        id: true,
-        address: true,
-        valuation: true,
-        userId: true,
-        user: true,
-      },
+      where: { id: { in: params.ids }, userId: params.userId },
     });
 
     if (!houses) throw new Error("House not found");
@@ -51,15 +52,7 @@ export class HouseRepo implements IHouseRepository {
   }
 
   async listHouse() {
-    const houses = await prismaClient.house.findMany({
-      select: {
-        id: true,
-        address: true,
-        valuation: true,
-        userId: true,
-        user: true,
-      },
-    });
+    const houses = await prismaClient.house.findMany({});
     if (!houses) throw new Error("House not found");
 
     return houses.map(this.prismaHouseToHouse);
@@ -92,19 +85,21 @@ export class HouseRepo implements IHouseRepository {
   }
 
   prismaHouseToHouse(params: PrismaHouse): House {
-    if (params.userId == null) {
-      return new House({
-        id: params.id,
-        address: params.address,
-        valuation: params.valuation,
-      });
-    }
+    // if (params.userId == null) {
+    //   return new House({
+    //     id: params.id,
+    //     address: params.address,
+    //     valuation: params.valuation,
+    //     createdAt:params.createdAt,
+    //   });
+    // }
 
     return new House({
       id: params.id,
       address: params.address,
       valuation: params.valuation,
-      userId: params.userId,
+      createdAt: params.createdAt,
+      userId: params.userId ? params.userId : undefined,
     });
   }
 }

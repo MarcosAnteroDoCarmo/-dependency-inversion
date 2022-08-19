@@ -13,7 +13,8 @@ export class ProfileRepo implements IProfileRepository {
         userName: params.userName,
         createdAt: params.createdAt,
         userId: params.userId,
-      },include: {User: true}
+      },
+      include: { User: true },
     });
 
     console.log("repo..............................................");
@@ -55,12 +56,6 @@ export class ProfileRepo implements IProfileRepository {
   async listProfile() {
     const profiles = await prismaClient.profile.findMany({
       where: {},
-      select: {
-        id: true,
-        userName: true,
-        createdAt: true,
-        userId: true,
-      },
     });
 
     if (!profiles) throw new Error("Profile not found");
@@ -98,8 +93,8 @@ export class ProfileRepo implements IProfileRepository {
     return new Profile({
       id: params.id,
       userName: params.userName,
-      userId: params.userId
-      
+      createdAt: params.createdAt,
+      userId: params.userId,
     });
   }
 }

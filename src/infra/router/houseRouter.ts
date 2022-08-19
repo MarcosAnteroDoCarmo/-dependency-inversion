@@ -14,10 +14,7 @@ houseRouter.get(
   houseController.findOne.bind(houseController)
 );
 
-houseRouter.get(
-  "/manyHouses/:valuation",
-  houseController.findMany.bind(houseController)
-);
+houseRouter.get("/manyHouses", houseController.findMany.bind(houseController));
 
 houseRouter.delete(
   "/houses/:address",

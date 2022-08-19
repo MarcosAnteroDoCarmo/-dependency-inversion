@@ -1,4 +1,11 @@
-import { IUserRepository } from "../../domain/contracts/contractsUserRepo";
+import {
+  DeleteUser,
+  FindManyUser,
+  FindOneUser,
+  IUserRepository,
+  ListUser,
+  UpdateUser,
+} from "../../domain/contracts/contractsUserRepo";
 import { ConstructUserDTO, User } from "../../domain/entities/user";
 
 export class UserService {
@@ -10,6 +17,8 @@ export class UserService {
       userName,
       email,
       password,
+      money,
+      createdAt,
       profileId,
       houseIds,
       stockIds,
@@ -20,47 +29,55 @@ export class UserService {
       userName,
       email,
       password,
+      money,
+      createdAt,
       profileId,
       houseIds,
       stockIds,
     });
 
-    console.log("service..............................................")
-    console.log(user)
+    console.log("service..............................................");
+    console.log(user);
 
     return this.userRepository.createUser(user);
   }
 
-  findOneUser(email: string) {
-    const user = this.userRepository.findOneUser(email);
+  findOneUser(params: FindOneUser) {
+    const user = this.userRepository.findOneUser(params);
 
     return user;
   }
 
-  findManyUser(userName: string) {
-    const user = this.userRepository.findManyUser(userName);
+  async findManyUser(params: FindManyUser) {
+    const user = await this.userRepository.findManyUser(params);
+
+    console.log("findManyService.....................................");
+    console.log(params);
 
     return user;
   }
 
-  listUser(options?: {
-    include: { houses: boolean; profile: boolean; stocks: boolean };
-  }) {
-    const user = this.userRepository.listUser(options);
+  listUser(params: ListUser) {
+    const user = this.userRepository.listUser(params);
 
     return user;
   }
 
-  deleteUser(email: string) {
-    const user = this.userRepository.deleteUser(email);
+  count() {
+    const user = this.userRepository.count();
 
     return user;
   }
 
-  updateUser(params: User) {
+  deleteUser(params: DeleteUser) {
+    const user = this.userRepository.deleteUser(params);
+
+    return user;
+  }
+
+  updateUser(params: UpdateUser) {
     const user = this.userRepository.updateUser(params);
 
     return user;
   }
 }
-

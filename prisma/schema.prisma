@@ -9,9 +9,11 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  userName  String
+  userName  String   
   email     String   @unique
   password  String
+  money     Int     @default(0)
+  createdAt DateTime
   profile   Profile?
   houses    House[]
   stocks    Stocks[]
@@ -33,7 +35,8 @@ model House {
   id        String  @id @default(uuid())
   address   String  @unique
   valuation Int
-  user      User?   @relation(fields: [userId], references: [id])
+  createdAt DateTime
+  user      User?   @relation(fields: [userId], references: [id], onUpdate:Cascade )
   userId    String?
 
   @@map("house")
@@ -43,6 +46,7 @@ model Stocks {
   id        String @id @default(uuid())
   company   String @unique
   valuation Int
+  createdAt DateTime
   user      User[]
 
   @@map("stocks")

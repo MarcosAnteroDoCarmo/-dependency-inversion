@@ -6,8 +6,7 @@ export class UserController {
 
   async create(req: Request, res: Response) {
     try {
-      const { email, password, userName, houseIds, profileId, stockIds } =
-        req.body;
+      const { email, password, userName } = req.body;
 
       if (!userName) throw new Error(" a userName is needed");
       if (!email) throw new Error(" a email is needed");
@@ -16,7 +15,7 @@ export class UserController {
       console.log("controller........................................");
       console.log(req.body);
 
-      if (await this.userService.findOneUser(email))
+      if (await this.userService.findOneUser({ email }))
         throw new Error("This user already exists");
 
       const user = await this.userService.createUser(req.body);
@@ -39,7 +38,7 @@ export class UserController {
       const options = {
         include: { houses: true, profile: true, stocks: true },
       };
-      const users = await this.userService.listUser(options);
+      const users = await this.userService.listUser({ options });
 
       return res.send({ users });
     } catch {
@@ -51,7 +50,7 @@ export class UserController {
     try {
       const { email } = req.params;
 
-      const users = await this.userService.findOneUser(email);
+      const users = await this.userService.findOneUser({ email });
 
       return res.send({ users });
     } catch {
@@ -61,12 +60,16 @@ export class UserController {
 
   async findMany(req: Request, res: Response) {
     try {
-      const { userName } = req.params;
+      const queryOptions = req.query;
 
-      const users = await this.userService.findManyUser(userName);
+      const users = await this.userService.findManyUser({
+        queryOptions,
+      });
+      const count = await this.userService.count();
 
-      return res.send({ users });
-    } catch {
+      return res.send({ count, users });
+    } catch (e) {
+      console.error(e);
       return res.status(400).send({ message: "Error reading user" });
     }
   }
@@ -77,10 +80,10 @@ export class UserController {
 
       if (!email) throw new Error("I need email for this!");
 
-      if (!(await this.userService.findOneUser(email)))
+      if (!(await this.userService.findOneUser({ email })))
         throw new Error("This email does not exist");
 
-      await this.userService.deleteUser(email);
+      await this.userService.deleteUser({ email });
 
       return res.send({ message: "User deleted" });
     } catch (err: unknown) {
@@ -94,7 +97,7 @@ export class UserController {
       const { email } = req.params;
       const data = req.body;
 
-      if (!(await this.userService.findOneUser(email)))
+      if (!(await this.userService.findOneUser({ email })))
         throw new Error("This email does not exist");
 
       if (email !== data.email) throw new Error("Unable to change email");

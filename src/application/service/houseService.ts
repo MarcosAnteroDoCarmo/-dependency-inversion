@@ -1,25 +1,29 @@
-import { IHouseRepository } from "../../domain/contracts/contractsHouseRepo";
+import {
+  FindManyHouse,
+  FindOneHouse,
+  IHouseRepository,
+} from "../../domain/contracts/contractsHouseRepo";
 import { ConstructHouseDTO, House } from "../../domain/entities/house";
 
 export class HouseService {
   constructor(private houseRepository: IHouseRepository) {}
 
   createHouse(params: ConstructHouseDTO): Promise<House> {
-    const { id, address, valuation, userId } = params;
+    const { id, address, createdAt, valuation, userId } = params;
 
-    const house = new House({ id, address, valuation, userId });
+    const house = new House({ id, address, createdAt, valuation, userId });
 
     return this.houseRepository.createHouse(house);
   }
 
-  findOneHouse(address: string) {
-    const house = this.houseRepository.findOneHouse(address);
+  findOneHouse(params: FindOneHouse) {
+    const house = this.houseRepository.findOneHouse(params);
 
     return house;
   }
 
-  findManyHouse(valuation: number) {
-    const house = this.houseRepository.findManyHouse(valuation);
+  findManyHouse(params: FindManyHouse) {
+    const house = this.houseRepository.findManyHouse(params);
 
     return house;
   }

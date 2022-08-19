@@ -10,10 +10,7 @@ stocksRouter.get("/stocks", stockControler.list.bind(stockControler));
 
 stocksRouter.get("/stocks/:id", stockControler.findOne.bind(stockControler));
 
-stocksRouter.get(
-  "/manyStocks/:valuation",
-  stockControler.findMany.bind(stockControler)
-);
+stocksRouter.get("/manyStocks", stockControler.findMany.bind(stockControler));
 
 stocksRouter.delete(
   "/stocks/:id",

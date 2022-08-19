@@ -1,7 +1,7 @@
-
 export type ConstructProfileDTO = {
   id?: string;
   userName: string;
+  createdAt: Date;
   userId: string;
 };
 
@@ -14,7 +14,7 @@ export class Profile {
   constructor(params: ConstructProfileDTO) {
     this._id = params.id;
     this._userName = params.userName;
-    this._createdAt = new Date();
+    this._createdAt = params.createdAt || new Date();
     this._userId = params.userId;
   }
 

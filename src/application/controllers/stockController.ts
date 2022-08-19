@@ -6,7 +6,7 @@ export class StockController {
 
   async create(req: Request, res: Response) {
     try {
-      const { id, company, valuation, userId } = req.body;
+      const { company, valuation } = req.body;
 
       if (!company) throw new Error(" a company is needed");
       if (!valuation) throw new Error(" a valuation is needed");
@@ -41,7 +41,7 @@ export class StockController {
     try {
       const { id } = req.params;
 
-      const stocks = await this.stockService.findOneStocks(id);
+      const stocks = await this.stockService.findOneStock({ id });
 
       return res.send({ stocks });
     } catch {
@@ -51,11 +51,9 @@ export class StockController {
 
   async findMany(req: Request, res: Response) {
     try {
-      const { valuation } = req.params;
+      const { ids } = req.body;
 
-      const stocks = await this.stockService.findManyStocks(
-        parseFloat(valuation)
-      );
+      const stocks = await this.stockService.findManyStocks({ ids });
 
       return res.send({ stocks });
     } catch {
@@ -69,7 +67,7 @@ export class StockController {
 
       if (!id) throw new Error("I need email for this!");
 
-      if (!(await this.stockService.findOneStocks(id)))
+      if (!(await this.stockService.findOneStock({ id })))
         throw new Error("This email does not exist");
 
       await this.stockService.deleteStocks(id);
@@ -86,7 +84,7 @@ export class StockController {
       const { id } = req.params;
       const data = req.body;
 
-      if (!(await this.stockService.findOneStocks(id)))
+      if (!(await this.stockService.findOneStock({ id })))
         throw new Error("This email does not exist");
 
       if (id !== data.id) throw new Error("Unable to change id");
