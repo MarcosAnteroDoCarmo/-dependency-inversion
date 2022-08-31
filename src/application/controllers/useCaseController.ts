@@ -15,7 +15,6 @@ export class UseCaseController {
       );
 
       const message = "transfer made successfully";
-      console.log(message);
 
       return res.send({ message, trade });
     } catch (err: unknown) {
@@ -28,18 +27,13 @@ export class UseCaseController {
     try {
       const { buyerId, houseId, amountMoney } = req.body;
 
-      console.log(req.body);
-
       const tradeHouse = await this.useCaseService.buyHouse(
         buyerId,
         houseId,
         amountMoney
       );
 
-      console.log(tradeHouse);
-
       const message = "transfer made successfully";
-      console.log(message);
 
       return res.send({ message, tradeHouse });
     } catch (err: unknown) {
@@ -52,18 +46,13 @@ export class UseCaseController {
     try {
       const { buyerId, stockId, amountMoney } = req.body;
 
-      console.log(req.body);
-
       const tradeStock = await this.useCaseService.buyStock(
         buyerId,
         stockId,
         amountMoney
       );
 
-      console.log(tradeStock);
-
       const message = "transfer made successfully";
-      console.log(message);
 
       return res.send({ message, tradeStock });
     } catch (err: unknown) {
@@ -75,16 +64,9 @@ export class UseCaseController {
     try {
       const { userId } = req.body;
 
-      console.log(req.body);
-
-      const patrimony = await this.useCaseService.patrimony(
-        userId
-      );
-
-      console.log(patrimony);
+      const patrimony = await this.useCaseService.patrimony(userId);
 
       const message = "transfer made successfully";
-      console.log(message);
 
       return res.send({ message, patrimony });
     } catch (err: unknown) {

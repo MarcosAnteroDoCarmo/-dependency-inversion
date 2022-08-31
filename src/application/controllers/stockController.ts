@@ -9,13 +9,10 @@ export class StockController {
       const { company, valuation } = req.body;
 
       if (!company) throw new Error(" a company is needed");
+
       if (!valuation) throw new Error(" a valuation is needed");
 
-      console.log(req.body);
-
       const stocks = await this.stockService.createStocks(req.body);
-
-      console.log(stocks);
 
       return res.send({ Stocks: stocks, message: "New Stocks created" });
     } catch (err: unknown) {

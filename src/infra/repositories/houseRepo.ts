@@ -33,9 +33,7 @@ export class HouseRepo implements IHouseRepository {
     });
 
     if (!house) {
-      console.log("House not found");
-
-      return house;
+      throw new Error("House not found");
     }
 
     return this.prismaHouseToHouse(house);
@@ -85,15 +83,6 @@ export class HouseRepo implements IHouseRepository {
   }
 
   prismaHouseToHouse(params: PrismaHouse): House {
-    // if (params.userId == null) {
-    //   return new House({
-    //     id: params.id,
-    //     address: params.address,
-    //     valuation: params.valuation,
-    //     createdAt:params.createdAt,
-    //   });
-    // }
-
     return new House({
       id: params.id,
       address: params.address,

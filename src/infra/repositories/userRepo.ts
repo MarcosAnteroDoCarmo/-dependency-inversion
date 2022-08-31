@@ -1,24 +1,26 @@
 import {
   House,
+  Prisma,
   prisma,
   Profile,
   Stocks,
   User as PrismaUser,
 } from "@prisma/client";
-import { stringify } from "querystring";
 import {
+  CountUser,
   CreateUser,
   DeleteUser,
-  FindManyUser,
+  FindManyUserRepository,
   FindOneUser,
   IUserRepository,
   ListUser,
   TransferHouse,
   TransferStocks,
-  UpdadeMoney,
+  UpdateMoney,
   UpdateUser,
 } from "../../domain/contracts/contractsUserRepo";
 import { User } from "../../domain/entities/user";
+import { isEmptyObject, stringToNumberOrUndefined } from "../../helpers";
 import { prismaClient } from "../data/mysql/prismaClient";
 
 export class UserRepo implements IUserRepository {
@@ -34,9 +36,6 @@ export class UserRepo implements IUserRepository {
       },
     });
 
-    console.log("transferHouse.............................................");
-    console.log(user);
-
     return this.prismaUserToUser(user);
   }
   async transferStocks(params: TransferStocks) {
@@ -49,13 +48,10 @@ export class UserRepo implements IUserRepository {
       },
     });
 
-    console.log("transferHouse.............................................");
-    console.log(user);
-
     return this.prismaUserToUser(user);
   }
 
-  async updadeMoney(params: UpdadeMoney) {
+  async updateMoney(params: UpdateMoney) {
     const user = await prismaClient.user.update({
       where: { id: params.userId },
       data: {
@@ -71,17 +67,7 @@ export class UserRepo implements IUserRepository {
       },
     });
 
-    console.log("transfermoney.............................................");
-    console.log(user);
-
     return user;
-  }
-  async count() {
-    const users = await prismaClient.user.count();
-
-    if (!users) throw new Error("User not found");
-
-    return users;
   }
 
   async createUser(params: CreateUser) {
@@ -107,9 +93,6 @@ export class UserRepo implements IUserRepository {
       include: { houses: true, profile: true, stocks: true },
     });
 
-    console.log("repo..............................................");
-    console.log(user);
-
     return this.prismaUserToUser(user);
   }
 
@@ -130,142 +113,26 @@ export class UserRepo implements IUserRepository {
     });
 
     if (!user) {
-      console.log("User not found");
-
       return;
     }
 
     return this.prismaUserToUser(user);
   }
 
-  async findManyUser(params: FindManyUser) {
-    const convertStringToNumberOrUndefined = (
-      value: string | number | undefined
-    ) => {
-      if (!value) {
-        return undefined;
-      }
-      if (value === "0") {
-        return 0;
-      }
-
-      return Number(value);
-    };
-    const id = params.queryOptions?.id;
-    const userName = params.queryOptions?.userName;
-    const email = params.queryOptions?.email;
-    const money = convertStringToNumberOrUndefined(params.queryOptions?.money);
-    const createdAt = params.queryOptions?.createdAt;
-    const profile = params.queryOptions?.profileId || false;
-    const houses = params.queryOptions?.houseIds || false;
-    const stocks = params.queryOptions?.stockIds || false;
-    const order = params.queryOptions?.order;
-    const orderByQuery = params.queryOptions?.orderBy;
-    const take = Number(params.queryOptions?.pageSize || 5);
-    const skip = Number(params.queryOptions?.page || 0) * take;
-    const from = params.queryOptions?.from;
-    const to = params.queryOptions?.to;
-    const searchQuery = params.queryOptions?.search;
-    const searchBy = params.queryOptions?.searchBy;
-    const not = params.queryOptions?.not;
-    const range = {
-      gte: from,
-      lte: to,
-    };
-
-    console.log("query.............................................");
-    console.log("order=>", order);
-    console.log("pageSise=>", take);
-    console.log("pageNmber=>", skip);
-    console.log("search=>", searchQuery);
-    console.log("searchNumber=>", Number(searchQuery));
-    console.log("profile=>", profile);
-    console.log(
-      "isNaN=>",
-      isNaN(Number(searchQuery)) ? undefined : Number(searchQuery)
+  async count(params: CountUser) {
+    const amount = await prismaClient.user.count(
+      this.findQueryBuilder(params, true)
     );
 
-    const singleQuery = [
-      { id, email, userName, createdAt, money },
-      { createdAt: range },
-    ];
+    if (!amount) throw new Error("User not found");
 
-    const searchOne = [
-      {
-        [searchBy || "money"]:
-          searchBy === "money"
-            ? {
-                equals: isNaN(Number(searchQuery))
-                  ? undefined
-                  : Number(searchQuery),
-              }
-            : { contains: searchQuery },
-      },
-    ];
+    return amount;
+  }
 
-    const searchAll = [
-      { id, email, userName, createdAt, money },
-      { createdAt: range },
-      { id: { contains: searchQuery } },
-      { userName: { contains: searchQuery } },
-      { email: { contains: searchQuery } },
-      {
-        money: {
-          equals: isNaN(Number(searchQuery)) ? undefined : Number(searchQuery),
-        },
-      },
-    ];
-    const objectVazio = params.queryOptions
-      ? Object.keys(params.queryOptions).length === 0
-      : false;
-    console.log("objectVazio=>", objectVazio);
-
-    const test = params.queryOptions;
-    console.log("test=>", test);
-
-    const emptyObject = (obj: {}) => {
-      return JSON.stringify(obj) === "{}";
-    };
-
-    console.log("funcJSON", emptyObject(test || {}));
-
-    const or = emptyObject([test])
-      ? undefined
-      : { OR: searchBy ? searchOne : searchAll };
-
-    const makeOr = (params: FindManyUser) => {
-      if (id || userName || email || money || createdAt) {
-        return { OR: singleQuery };
-      }
-
-      if (params.queryOptions?.searchBy) {
-        return { OR: searchOne };
-      }
-      if (params.queryOptions?.search) {
-        return { OR: searchAll };
-      }
-      if (!emptyObject([params.queryOptions])) {
-        return undefined;
-      }
-    };
-
-    console.log("makeOr=>", makeOr(params));
-
-    const users = await prismaClient.user.findMany({
-      skip,
-      take,
-
-      where: !emptyObject(params.queryOptions || {})
-        ? { OR: searchBy ? searchOne : searchAll }
-        : undefined,
-
-      include: {
-        profile,
-        houses,
-        stocks,
-      },
-      orderBy: { [orderByQuery || "money"]: order || "asc" },
-    });
+  async findManyUser(params: FindManyUserRepository) {
+    const users = await prismaClient.user.findMany(
+      this.findQueryBuilder(params)
+    );
 
     if (!users) throw new Error("User not found");
 
@@ -347,5 +214,96 @@ export class UserRepo implements IUserRepository {
       houseIds: params.houses ? params.houses.map((house) => house.id) : [],
       stockIds: params.stocks ? params.stocks.map((stock) => stock.id) : [],
     });
+  }
+
+  findQueryBuilder(params: FindManyUserRepository, countOptions?: Boolean) {
+    const id = params.query?.id;
+    const userName = params.query?.userName;
+    const email = params.query?.email;
+    const createdAt = params.query?.createdAt;
+    const money = params.query?.money;
+    const searchQuery = params.query?.search;
+    const searchBy = params.query?.searchBy;
+    const fromCreatedAt = params.query?.fromCreatedAt;
+    const toCreatedAt = params.query?.toCreatedAt;
+    const rangeCreatedAt = { gte: fromCreatedAt, lte: toCreatedAt };
+    const fromMoney = params.query?.fromMoney;
+    const toMoney = params.query?.toMoney;
+    const rangeMoney = { gte: fromMoney, lte: toMoney };
+
+    const searchOne = [
+      {
+        [searchBy || "money"]:
+          searchBy === "money"
+            ? { equals: stringToNumberOrUndefined(searchQuery) }
+            : { contains: searchQuery },
+      },
+    ];
+
+    const searchAll = [
+      { createdAt: rangeCreatedAt },
+      { money: rangeMoney },
+      { id: { contains: searchQuery } },
+      { userName: { contains: searchQuery } },
+      { email: { contains: searchQuery } },
+      { money: { equals: stringToNumberOrUndefined(searchQuery) } },
+    ];
+
+    const where = (params: FindManyUserRepository) => {
+      if (isEmptyObject(params || {})) {
+        return undefined;
+      }
+
+      if (id || email || userName || createdAt || money) {
+        return { id, email, userName, createdAt, money };
+      }
+
+      if (money === 0) {
+        return { OR: { money: 0 } };
+      }
+
+      if (searchBy) {
+        return { OR: searchOne };
+      }
+
+      if (searchQuery || fromCreatedAt || toCreatedAt || fromMoney || toMoney) {
+        return { OR: searchAll };
+      }
+
+      return undefined;
+    };
+
+    const returnAll = {
+      skip: params.query?.skip,
+      take: params.query?.take,
+
+      where: where(params),
+
+      select: {
+        id: true,
+        userName: true,
+        email: true,
+        money: true,
+        profile: params.query?.profileId || false,
+        houses: params.query?.houseIds || false,
+        stocks: params.query?.stockIds || false,
+      },
+
+      orderBy: {
+        [searchBy || "money"]: params.query?.order || "asc",
+      },
+    };
+
+    const countReturn = {
+      where: where(params),
+
+      orderBy: {
+        [searchBy || "money"]: params.query?.order || "asc",
+      },
+    };
+
+    if (countOptions) return countReturn;
+
+    return returnAll;
   }
 }

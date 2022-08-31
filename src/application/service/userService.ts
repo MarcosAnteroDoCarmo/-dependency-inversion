@@ -1,6 +1,7 @@
 import {
+  CountUser,
   DeleteUser,
-  FindManyUser,
+  FindManyUserRepository,
   FindOneUser,
   IUserRepository,
   ListUser,
@@ -36,9 +37,6 @@ export class UserService {
       stockIds,
     });
 
-    console.log("service..............................................");
-    console.log(user);
-
     return this.userRepository.createUser(user);
   }
 
@@ -48,11 +46,8 @@ export class UserService {
     return user;
   }
 
-  async findManyUser(params: FindManyUser) {
+  async findManyUser(params: FindManyUserRepository) {
     const user = await this.userRepository.findManyUser(params);
-
-    console.log("findManyService.....................................");
-    console.log(params);
 
     return user;
   }
@@ -63,8 +58,8 @@ export class UserService {
     return user;
   }
 
-  count() {
-    const user = this.userRepository.count();
+  count(params: CountUser) {
+    const user = this.userRepository.count(params);
 
     return user;
   }

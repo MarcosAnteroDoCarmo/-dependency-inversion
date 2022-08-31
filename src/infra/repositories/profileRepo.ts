@@ -1,4 +1,3 @@
-import { Profile as PrismaProfile } from "@prisma/client";
 import { IProfileRepository } from "../../domain/contracts/contractsProfileRepo";
 import { Profile } from "../../domain/entities/profile";
 import { prismaClient } from "../data/mysql/prismaClient";
@@ -17,9 +16,6 @@ export class ProfileRepo implements IProfileRepository {
       include: { User: true },
     });
 
-    console.log("repo..............................................");
-    console.log(profile);
-
     return this.prismaProfileToProfile(profile);
   }
 
@@ -27,12 +23,6 @@ export class ProfileRepo implements IProfileRepository {
     const profile = await prismaClient.profile.findUnique({
       where: { userName },
     });
-
-    if (!profile) {
-      console.log("Profile not found");
-
-      return profile;
-    }
 
     return this.prismaProfileToProfile(profile);
   }
@@ -54,9 +44,7 @@ export class ProfileRepo implements IProfileRepository {
   }
 
   async listProfile() {
-    const profiles = await prismaClient.profile.findMany({
-      where: {},
-    });
+    const profiles = await prismaClient.profile.findMany();
 
     if (!profiles) throw new Error("Profile not found");
 

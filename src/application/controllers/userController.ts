@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { FindManyUserRepository } from "../../domain/contracts/contractsUserRepo";
 import { UserService } from "../service/userService";
 
 export class UserController {
@@ -9,25 +10,19 @@ export class UserController {
       const { email, password, userName } = req.body;
 
       if (!userName) throw new Error(" a userName is needed");
-      if (!email) throw new Error(" a email is needed");
-      if (!password) throw new Error(" a password is needed");
 
-      console.log("controller........................................");
-      console.log(req.body);
+      if (!email) throw new Error(" a email is needed");
+
+      if (!password) throw new Error(" a password is needed");
 
       if (await this.userService.findOneUser({ email }))
         throw new Error("This user already exists");
 
       const user = await this.userService.createUser(req.body);
 
-      console.log("Retorno do Controller.............................");
-      console.log(user);
-
       return res.send({ user, message: "New user created" });
     } catch (err: unknown) {
       if (err instanceof Error) return res.status(400).send(err.message);
-
-      console.log(err);
 
       return res.status(500).send("Server Error");
     }
@@ -58,16 +53,24 @@ export class UserController {
     }
   }
 
-  async findMany(req: Request, res: Response) {
+  async findMany(
+    req: Request<{}, {}, {}, FindManyUserRepository["query"]>,
+    res: Response
+  ) {
     try {
       const queryOptions = req.query;
 
       const users = await this.userService.findManyUser({
-        queryOptions,
+        query: queryOptions,
       });
-      const count = await this.userService.count();
 
-      return res.send({ count, users });
+      const countUsers = await this.userService.count({
+        query: queryOptions,
+      });
+
+      const numberOfPages = Math.ceil(countUsers / (queryOptions.take || 5));
+
+      return res.send({ countUsers, numberOfPages, users });
     } catch (e) {
       console.error(e);
       return res.status(400).send({ message: "Error reading user" });

@@ -9,22 +9,17 @@ export class HouseController {
       const { address, valuation } = req.body;
 
       if (!address) throw new Error(" a address is needed");
+
       if (!valuation) throw new Error(" a valuation is needed");
 
-      console.log(req.body);
-
-      if (await this.houseService.findOneHouse({address}))
+      if (await this.houseService.findOneHouse({ address }))
         throw new Error("This House already exists");
 
       const house = await this.houseService.createHouse(req.body);
 
-      console.log(house);
-
       return res.send({ house, message: "New House created" });
     } catch (err: unknown) {
       if (err instanceof Error) return res.status(400).send(err.message);
-
-      console.log(err);
 
       return res.status(500).send("Server Error");
     }
@@ -56,9 +51,7 @@ export class HouseController {
     try {
       const { ids } = req.body;
 
-      const houses = await this.houseService.findManyHouse(
-        ({ids})
-      );
+      const houses = await this.houseService.findManyHouse({ ids });
 
       return res.send({ houses });
     } catch {

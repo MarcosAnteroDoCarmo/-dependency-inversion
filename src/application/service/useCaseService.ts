@@ -52,12 +52,12 @@ export class UseCaseService {
 
       const newValueReceiver = receiverUser.money + amountMoney;
 
-      const payUserNow = await this.userRepository.updadeMoney({
+      const payUserNow = await this.userRepository.updateMoney({
         userId: userId,
         value: newValuePay,
       });
 
-      const receiverUserNow = await this.userRepository.updadeMoney({
+      const receiverUserNow = await this.userRepository.updateMoney({
         userId: recipientUserId,
         value: newValueReceiver,
       });
@@ -106,7 +106,7 @@ export class UseCaseService {
         houseIds: [houseId],
       });
 
-      const buyerUserNow = await this.userRepository.updadeMoney({
+      const buyerUserNow = await this.userRepository.updateMoney({
         userId: buyerId,
         value: newValue,
         options: { select: { houses: true } },
@@ -134,7 +134,7 @@ export class UseCaseService {
 
       const newValueReceiver = sellerUse.money + amountMoney;
 
-      const sellerUserNow = await this.userRepository.updadeMoney({
+      const sellerUserNow = await this.userRepository.updateMoney({
         userId: sellerUse.id,
         value: newValueReceiver,
       });
@@ -191,7 +191,7 @@ export class UseCaseService {
         stockIds: stockId,
       });
 
-      const buyerUserNow = await this.userRepository.updadeMoney({
+      const buyerUserNow = await this.userRepository.updateMoney({
         userId: buyerId,
         value: newValue,
         options: { select: { stocks: true } },

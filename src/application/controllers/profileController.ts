@@ -10,20 +10,14 @@ export class ProfileController {
 
       if (!userName) throw new Error(" a profileName is needed");
 
-      console.log(req.body);
-
       if (await this.profileService.findOneProfile(userName))
         throw new Error("This profile already exists");
 
       const profile = await this.profileService.createProfile(req.body);
 
-      console.log(profile);
-
       return res.send({ profile, message: "New profile created" });
     } catch (err: unknown) {
       if (err instanceof Error) return res.status(400).send(err.message);
-
-      console.log(err);
 
       return res.status(500).send("Server Error");
     }
