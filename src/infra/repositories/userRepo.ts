@@ -1,7 +1,5 @@
 import {
   House,
-  Prisma,
-  prisma,
   Profile,
   Stocks,
   User as PrismaUser,
